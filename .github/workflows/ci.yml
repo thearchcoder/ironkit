@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      - run: uv run ruff check src tests
+      - run: uv run ruff format --check src tests
+      - run: uv run pyright
+      - run: uv run pyright --pythonplatform Windows src/ironkit/backends/windows.py
+      - run: uv run pyright --pythonplatform Darwin src/ironkit/backends/macos.py
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync
+      - run: uv run pytest
+
+  live-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y xvfb openbox
+      - run: uv sync
+      - name: Live tests without a window manager
+        run: xvfb-run -a -s "-screen 0 1280x720x24" uv run pytest -m live
+      - name: Live tests under openbox
+        run: |
+          xvfb-run -a -s "-screen 0 1280x720x24" bash -c '
+            openbox >/dev/null 2>&1 &
+            sleep 1
+            uv run pytest -m live
+            status=$?
+            kill %1
+            exit $status
+          '
+
+  live-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      - run: uv run pytest -m live tests/test_live_smoke.py
