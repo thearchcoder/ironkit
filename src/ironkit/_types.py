@@ -47,6 +47,16 @@ class Point:
 PointLike = Point | tuple[int, int] | tuple[float, float]
 
 
+def point_from(x: int | float | PointLike, y: int | float | None = None) -> Point:
+    if isinstance(x, (int, float)):
+        if y is None:
+            raise TypeError("y is required when x is a number")
+        return Point(round(x), round(y))
+    if y is not None:
+        raise TypeError("y must be omitted when x is a point")
+    return Point.of(x)
+
+
 @dataclass(frozen=True, slots=True)
 class Size:
     width: int

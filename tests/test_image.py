@@ -24,11 +24,11 @@ def noise(rng: np.random.Generator, h: int, w: int) -> np.ndarray:
     return rng.integers(0, 256, (h, w, 3), dtype=np.uint8)
 
 
-def pil_png(array: np.ndarray, mode: str, **save: object) -> bytes:
+def pil_png(array: np.ndarray, mode: str, colors: int = 256, **save: object) -> bytes:
     buffer = io.BytesIO()
     image = PILImage.fromarray(array)
     if mode == "P":
-        image = image.convert("P", palette=PILImage.Palette.ADAPTIVE, colors=save.pop("colors", 256))
+        image = image.convert("P", palette=PILImage.Palette.ADAPTIVE, colors=colors)
     elif mode != image.mode:
         image = image.convert(mode)
     image.save(buffer, "PNG", **save)

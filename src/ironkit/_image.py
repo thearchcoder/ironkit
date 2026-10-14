@@ -14,7 +14,7 @@ import numpy.typing as npt
 from ._config import config
 from ._ease import Ease, linear
 from ._errors import ImageNotFoundError
-from ._types import Button, Color, ColorLike, Point, PointLike, Region, RegionLike, Size
+from ._types import Button, Color, ColorLike, Point, PointLike, Region, RegionLike, Size, point_from
 
 Pixels = npt.NDArray[np.uint8]
 ImageLike = Union["Image", str, "os.PathLike[str]", Pixels, Any]
@@ -264,7 +264,7 @@ class Image:
         return Region(self.origin.x, self.origin.y, self.width, self.height)
 
     def pixel(self, x: int | PointLike, y: int | None = None) -> Color:
-        p = Point.of(x) if y is None else Point(int(x), y)
+        p = point_from(x, y)
         if not self.region.contains(p):
             raise ValueError(f"point {tuple(p)} is outside image region {tuple(self.region)}")
         r, g, b = self.pixels[p.y - self.origin.y, p.x - self.origin.x]

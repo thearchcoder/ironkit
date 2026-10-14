@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from ._config import config
 from ._image import Image, ImageLike, Match, locate_all, not_found, pick
-from ._types import Color, ColorLike, Monitor, Point, PointLike, Region, RegionLike, Size
+from ._types import Color, ColorLike, Monitor, Point, PointLike, Region, RegionLike, Size, point_from
 from .backends import get_backend
 
 Capture = Callable[[], Image]
@@ -124,7 +124,7 @@ class Screen:
         return self.region.center
 
     def contains(self, x: int | PointLike, y: int | None = None) -> bool:
-        point = Point.of(x) if y is None else Point(int(x), y)
+        point = point_from(x, y)
         return self.region.contains(point)
 
     def screenshot(self, region: RegionLike | None = None, path: str | os.PathLike[str] | None = None) -> Image:
@@ -134,7 +134,7 @@ class Screen:
         return image
 
     def pixel(self, x: int | PointLike, y: int | None = None) -> Color:
-        point = Point.of(x) if y is None else Point(int(x), y)
+        point = point_from(x, y)
         return capture(Region(point.x, point.y, 1, 1)).pixel(point)
 
     def pixel_matches(

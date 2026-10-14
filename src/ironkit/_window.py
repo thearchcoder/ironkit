@@ -8,7 +8,7 @@ from ._config import config
 from ._errors import WindowNotFoundError
 from ._image import Image, ImageLike, Match, pick
 from ._screen import Capture, capture, find_one, search, wait_gone
-from ._types import Color, Point, PointLike, Region, Size
+from ._types import Color, Point, PointLike, Region, Size, point_from
 from .backends import WindowHandle, WindowInfo, WindowState, get_backend
 
 TitleQuery = str | re.Pattern[str]
@@ -288,7 +288,7 @@ class Windows:
         return "" if window is None else window.title
 
     def at(self, x: int | PointLike, y: int | None = None) -> list[Window]:
-        point = Point.of(x) if y is None else Point(int(x), y)
+        point = point_from(x, y)
         backend = get_backend()
         found: list[Window] = []
         for handle in backend.list_windows():
