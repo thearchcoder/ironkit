@@ -177,6 +177,16 @@ def test_grayscale_and_region(rng: np.random.Generator, engine: str) -> None:
     assert image.find(needle, near=(90, 90)).region.topleft == ik.Point(60, 60)
 
 
+def test_ties_prefer_top_left(rng: np.random.Generator, engine: str) -> None:
+    hay = noise(rng, 80, 80)
+    needle = noise(rng, 10, 10)
+    for x, y in ((50, 50), (5, 50), (50, 5)):
+        hay[y : y + 10, x : x + 10] = needle
+    image = ik.Image(hay)
+    assert image.find(needle).region.topleft == ik.Point(50, 5)
+    assert [m.region.topleft for m in image.find_all(needle)] == [ik.Point(50, 5), ik.Point(5, 50), ik.Point(50, 50)]
+
+
 def test_flat_needle(engine: str) -> None:
     hay = np.zeros((50, 50, 3), np.uint8)
     hay[20:30, 5:15] = (200, 10, 10)

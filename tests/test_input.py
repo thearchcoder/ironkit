@@ -179,12 +179,15 @@ def test_failsafe_during_glide(fake: FakeBackend) -> None:
         ik.move_to(800, 800, duration=0.3)
 
 
-def test_pause_applies_once_per_call(fake: FakeBackend) -> None:
+def test_pause_applies_once_per_call(fake: FakeBackend, monkeypatch: pytest.MonkeyPatch) -> None:
+    from ironkit import _input
+
+    slept: list[float] = []
+    monkeypatch.setattr(_input.time, "sleep", slept.append)
     with ik.config.override(pause=0.05):
-        began = time.monotonic()
         ik.click(100, 100)
-        elapsed = time.monotonic() - began
-    assert 0.05 <= elapsed < 0.1
+        ik.drag_by(10, 10)
+    assert slept == [0.05, 0.05]
 
 
 def test_write_and_special_characters(fake: FakeBackend) -> None:
