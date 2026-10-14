@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ironkit"
+version = "0.1.0"
+description = "Reliable cross-platform desktop automation: mouse, keyboard, screen, image search and windows."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Unlicense"
+license-files = ["LICENSE"]
+keywords = ["automation", "gui", "mouse", "keyboard", "screenshot", "pyautogui", "desktop"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: The Unlicense (Unlicense)",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Topic :: Desktop Environment",
+  "Topic :: Software Development :: Testing",
+  "Typing :: Typed",
+]
+dependencies = [
+  "numpy>=1.24",
+  "pyobjc-framework-Quartz>=10; sys_platform == 'darwin'",
+  "pyobjc-framework-ApplicationServices>=10; sys_platform == 'darwin'",
+  "pyobjc-framework-Cocoa>=10; sys_platform == 'darwin'",
+]
+
+[project.optional-dependencies]
+vision = ["opencv-python-headless>=4.8"]
+pil = ["pillow>=10"]
+all = ["opencv-python-headless>=4.8", "pillow>=10"]
+
+[project.urls]
+Homepage = "https://github.com/thearchcoder/ironkit"
+Issues = "https://github.com/thearchcoder/ironkit/issues"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6", "pyright>=1.1.380", "pillow>=10", "opencv-python-headless>=4.8"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ironkit"]
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
+reportMissingImports = "none"
+reportMissingModuleSource = "none"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live: needs a real display and sends real input"]
+addopts = "-m 'not live'"
