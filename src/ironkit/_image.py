@@ -488,7 +488,7 @@ def locate_all(
     ys, xs = np.nonzero(scores >= threshold)
     if ys.size == 0:
         return [], best
-    order = np.lexsort((xs, ys, -np.round(scores[ys, xs], 6)))
+    order = np.lexsort((xs, ys, -np.round(scores[ys, xs], 3)))
     h, w = pin.shape[:2]
     taken: Pixels = np.zeros(scores.shape, np.uint8)
     matches: list[Match] = []
